@@ -1,21 +1,65 @@
 # JavaDevsProject
-Задача 3: Разработчик 3 (Ветка feat-io)
-Цель: Обеспечить ввод данных из разных источников и их валидацию.
+feat-comparators-validation
+Компараторы по трём полям + валидация данных.
 
-Что делает участник:
+Три компаратора для класса Car (ручная реализация, не через Comparator.comparing):
+ByPowerComparator — по мощности (по возрастанию)
+ByModelComparator — по модели (алфавитный порядок, String.compareTo)
+ByYearComparator — по году производства (по возрастанию)
+Каждый компаратор реализует Comparator<Car>.
+Валидация — класс CarValidator с методами:
+Мощность: положительное целое, диапазон 1–2000 л.с.
+Модель: непустая строка, не null, длина 1–50 символов
+Год производства: целое в диапазоне 1886–текущий год
+При невалидных данных — бросать ValidationException с понятным сообщением.
+Валидация применяется ко всем источникам: файл, рандом, ручной ввод.
 
-Создать интерфейс DataFiller с методом Car[] fill(int count).
-Реализовать три реализации:
-FileFiller: Читает файл (формат: мощность;модель;год, например 150;Toyota Camry;2020). Парсит строки, создает объекты через Car.Builder. Строки с ошибками пропускает, выводя предупреждение в консоль.
-RandomFiller: Генерирует случайные данные в валидных диапазонах (мощность 50–1000, год 1900–2024, модель генерируется из списка или случайных букв).
-ManualFiller: Запрашивает данные у пользователя через Scanner до тех пор, пока не будет получено нужное количество валидных объектов.
-Валидация: Создать класс CarValidator.
-Мощность: > 0.
-Год: >= 1886 (первый автомобиль) и <= текущий год.
-Модель: не null и не пустая строка.
-При ошибке выбрасывать кастомное исключение ValidationException или возвращать false (согласовать с тимлидом, лучше исключение).
+Пример компаратора:
+
+public class ByPowerComparator implements Comparator<Car> {
+    @Override
+    public int compare(Car c1, Car c2) {
+        return Integer.compare(c1.getPower(), c2.getPower());
+    }
+}
+
+Пример валидатора:
+
+public class CarValidator {
+    public void validatePower(int power) {
+        if (power < 1 || power > 2000) {
+            throw new ValidationException(
+                "Мощность должна быть от 1 до 2000 л.с., получено: " + power);
+        }
+    }
+
+    public void validateModel(String model) {
+        if (model == null || model.isBlank() || model.length() > 50) {
+            throw new ValidationException(
+                "Модель: непустая строка длиной до 50 символов");
+        }
+    }
+
+    public void validateYear(int year) {
+        int currentYear = Year.now().getValue();
+        if (year < 1886 || year > currentYear) {
+            throw new ValidationException(
+                "Год: от 1886 до " + currentYear + ", получено: " + year);
+        }
+    }
+
+    public void validate(Car car) {
+        validatePower(car.getPower());
+        validateModel(car.getModel());
+        validateYear(car.getManufactureYear());
+    }
+}
+
 Ключевые файлы:
 
-io/DataFiller.java
-io/FileFiller.java, io/RandomFiller.java, io/ManualFiller.java
-io/CarValidator.java, io/ValidationException.java
+comparator/ByPowerComparator.java
+comparator/ByModelComparator.java
+comparator/ByYearComparator.java
+validation/CarValidator.java
+validation/ValidationException.java
+
