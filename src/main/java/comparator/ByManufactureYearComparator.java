@@ -1,7 +1,6 @@
-package comparator;
+package main.java.comparator;
 
 import model.Car;
-
 import java.util.Comparator;
 
 public class ByManufactureYearComparator implements Comparator<Car> {
