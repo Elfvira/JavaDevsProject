@@ -1,0 +1,4 @@
+150;Toyota Camry;2020
+250;BMW X5;2022
+105;Lada Vesta;2021
+190;Honda Civic;2019
