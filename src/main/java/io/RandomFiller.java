@@ -37,14 +37,17 @@ public class RandomFiller implements DataFiller {
         int currentYear = Year.now().getValue();
 
         for (int i = 0; i < length; i++) {
-            Car car = new Car.Builder()
-                    .power(1 + random.nextInt(2000))
-                    .model(MODELS[random.nextInt(MODELS.length)])
-                    .manufactureYear(1886 + random.nextInt(currentYear - 1885))
-                    .build();
+            int power = 1 + random.nextInt(2000);
+            String model = MODELS[random.nextInt(MODELS.length)];
+            int year = 1886 + random.nextInt(currentYear - 1885);
 
-            validator.validate(car);
-            cars[i] = car;
+            validator.validate(power, model, year);
+
+            cars[i] = new Car.Builder()
+                    .power(power)
+                    .model(model)
+                    .manufactureYear(year)
+                    .build();
         }
 
         return cars;

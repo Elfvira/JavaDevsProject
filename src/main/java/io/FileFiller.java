@@ -68,6 +68,7 @@ public class FileFiller implements DataFiller {
                     validator.validatePower(power);
                     validator.validateModel(model);
                     validator.validateYear(year);
+                    validator.validate(power, model, year);
 
                     Car car = new Car.Builder()
                             .power(power)
@@ -75,7 +76,6 @@ public class FileFiller implements DataFiller {
                             .manufactureYear(year)
                             .build();
 
-                    validator.validate(car);
                     cars.add(car);
                 } catch (RuntimeException e) {
                     System.out.println("Строка " + lineNumber + " пропущена: " + e.getMessage());

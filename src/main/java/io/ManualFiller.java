@@ -38,14 +38,13 @@ public class ManualFiller implements DataFiller {
             String model = readModel();
             int year = readYear();
 
-            Car car = new Car.Builder()
+            validator.validate(power, model, year);
+
+            cars[i] = new Car.Builder()
                     .power(power)
                     .model(model)
                     .manufactureYear(year)
                     .build();
-
-            validator.validate(car);
-            cars[i] = car;
         }
 
         return cars;
