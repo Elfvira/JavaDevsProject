@@ -1,6 +1,6 @@
-package main.java.comparator;
+package comparator;
 
-import main.java.model.Car;
+import model.Car;
 import java.util.Comparator;
 
 public class ByPowerComparator implements Comparator<Car> {

@@ -1,4 +1,4 @@
-package main.java.validation;
+package validation;
 
 import java.time.Clock;
 import java.time.Year;
