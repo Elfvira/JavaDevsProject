@@ -1,3 +1,4 @@
+
 # JavaDevsProject
 ветка feat-sorting
 Паттерн Strategy: три реализации алгоритмов сортировки.
@@ -41,4 +42,6 @@ public class BubbleSortStrategy<T> implements SortStrategy<T> {
 strategy/BubbleSortStrategy.java
 strategy/InsertionSortStrategy.java
 strategy/SelectionSortStrategy.java
+=======
+
 
