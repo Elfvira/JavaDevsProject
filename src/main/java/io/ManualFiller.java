@@ -1,4 +1,4 @@
-package io;
+package model;
 
 import model.Car;
 import validation.CarValidator;
