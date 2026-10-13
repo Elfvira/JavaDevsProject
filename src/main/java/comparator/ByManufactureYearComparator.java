@@ -1,11 +1,8 @@
 package comparator;
 
-import model.Car;
-import java.util.Comparator;
-
-public class ByManufactureYearComparator implements Comparator<Car> {
-    @Override
-    public int compare(Car o1, Car o2) {
-        return o1.getManufactureYear() - o2.getManufactureYear();
-    }
+/**
+ * Синоним для {@link ByYearComparator} для обратной совместимости
+ * с кодом участников команды.
+ */
+public class ByManufactureYearComparator extends ByYearComparator {
 }

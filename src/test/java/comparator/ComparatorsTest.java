@@ -1,12 +1,12 @@
 package comparator;
 
 import model.Car;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import strategy.BubbleSortStrategy;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -17,9 +17,8 @@ import static support.Cars.car;
 class ComparatorsTest {
 
     private static List<String> sortedModels(Comparator<Car> comparator, Car... cars) {
-        List<Car> list = new ArrayList<>(List.of(cars));
-        list.sort(comparator);
-        return list.stream().map(Car::getModel).toList();
+        Car[] sorted = new BubbleSortStrategy<Car>().sort(cars, comparator);
+        return Arrays.stream(sorted).map(Car::getModel).toList();
     }
 
     @Nested
@@ -62,9 +61,6 @@ class ComparatorsTest {
         }
 
         @Test
-        @Disabled("Известный баг: компаратор использует вычитание, при больших значениях происходит "
-                + "переполнение int. Исправление: Integer.compare(o1.getPower(), o2.getPower()). "
-                + "Убрать @Disabled после правки.")
         void doesNotOverflowOnExtremeValues() {
             assertTrue(cmp.compare(car(Integer.MAX_VALUE, "a", 2000), car(-5, "b", 2000)) > 0);
         }
@@ -133,6 +129,11 @@ class ComparatorsTest {
         void sortsListAscending() {
             assertEquals(List.of("old", "mid", "new"),
                     sortedModels(cmp, car(1, "new", 2022), car(1, "old", 1990), car(1, "mid", 2005)));
+        }
+
+        @Test
+        void doesNotOverflowOnExtremeYears() {
+            assertTrue(cmp.compare(car(1, "a", Integer.MAX_VALUE), car(1, "b", -5)) > 0);
         }
     }
 }

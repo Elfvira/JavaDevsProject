@@ -1,5 +1,7 @@
 package validation;
 
+import model.Car;
+
 import java.time.Clock;
 import java.time.Year;
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ public class CarValidator {
     public CarValidator() {
         this(Clock.systemDefaultZone());
     }
+
     public CarValidator(Clock clock) {
         this.clock = clock;
     }
@@ -42,11 +45,19 @@ public class CarValidator {
     }
 
     // Для ввода из консоли
-    public void validatePower(int power) { throwIfPresent(checkPower(power)); }
-    public void validateModel(String model) { throwIfPresent(checkModel(model)); }
-    public void validateYear(int year) { throwIfPresent(checkYear(year)); }
+    public void validatePower(int power) {
+        throwIfPresent(checkPower(power));
+    }
 
-    // Для билдера
+    public void validateModel(String model) {
+        throwIfPresent(checkModel(model));
+    }
+
+    public void validateYear(int year) {
+        throwIfPresent(checkYear(year));
+    }
+
+    // Для билдера и полей
     public void validate(int power, String model, int year) {
         List<String> errors = new ArrayList<>();
         checkPower(power).ifPresent(errors::add);
@@ -57,7 +68,16 @@ public class CarValidator {
         }
     }
 
+    public void validate(Car car) {
+        if (car == null) {
+            throw new ValidationException("Автомобиль не может быть null");
+        }
+        validate(car.getPower(), car.getModel(), car.getManufactureYear());
+    }
+
     private void throwIfPresent(Optional<String> error) {
-        error.ifPresent(msg -> { throw new ValidationException(msg); });
+        error.ifPresent(msg -> {
+            throw new ValidationException(msg);
+        });
     }
 }

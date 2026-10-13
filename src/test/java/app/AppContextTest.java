@@ -3,6 +3,8 @@ package app;
 import comparator.ByPowerComparator;
 import comparator.ByYearComparator;
 import model.Car;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import strategy.BubbleSortStrategy;
 import strategy.InsertionSortStrategy;
 import strategy.SelectionSortStrategy;
@@ -15,7 +17,7 @@ import static app.TestUtil.captureOutput;
 import static app.TestUtil.check;
 
 /**
- * Ручные тесты для {@link AppContext}.
+ * Тесты для {@link AppContext}.
  */
 public class AppContextTest {
 
@@ -37,19 +39,22 @@ public class AppContextTest {
     }
 
     public static void main(String[] args) {
-        testSortsByPower();
-        testSourceArrayIsNotMutated();
-        testNothingConfigured();
-        testEachMissingSetting();
-        testInvalidLength();
-        testStrategyIsReplaceable();
-        testChangingLengthResetsData();
-        testEmptyResult();
-        testFillerErrorDoesNotCrash();
+        AppContextTest instance = new AppContextTest();
+        instance.testSortsByPower();
+        instance.testSourceArrayIsNotMutated();
+        instance.testNothingConfigured();
+        instance.testEachMissingSetting();
+        instance.testInvalidLength();
+        instance.testStrategyIsReplaceable();
+        instance.testChangingLengthResetsData();
+        instance.testEmptyResult();
+        instance.testFillerErrorDoesNotCrash();
         System.out.println("AppContextTest: all tests passed");
     }
 
-    private static void testSortsByPower() {
+    @Test
+    @DisplayName("Контекст сортирует массив по мощности")
+    void testSortsByPower() {
         AppContext ctx = readyContext();
         captureOutput(ctx::executeSortAndPrint);
         Car[] sorted = ctx.getSortedData();
@@ -58,20 +63,26 @@ public class AppContextTest {
         assertEquals(300, sorted[2].getPower(), "sorted[2]");
     }
 
-    private static void testSourceArrayIsNotMutated() {
+    @Test
+    @DisplayName("Исходный массив в контексте не мутируется при сортировке")
+    void testSourceArrayIsNotMutated() {
         AppContext ctx = readyContext();
         captureOutput(ctx::executeSortAndPrint);
         assertEquals(300, ctx.getData()[0].getPower(), "original keeps order");
     }
 
-    private static void testNothingConfigured() {
+    @Test
+    @DisplayName("Ненастроенный контекст просит задать способ заполнения")
+    void testNothingConfigured() {
         AppContext ctx = new AppContext();
         String out = captureOutput(ctx::executeSortAndPrint);
         check(out.contains("способ заполнения"), "asks for filler first");
         check(ctx.getSortedData() == null, "nothing sorted");
     }
 
-    private static void testEachMissingSetting() {
+    @Test
+    @DisplayName("Контекст проверяет каждую недостающую настройку по очереди")
+    void testEachMissingSetting() {
         AppContext ctx = new AppContext();
         ctx.setDataFiller(length -> sample());
         check(captureOutput(ctx::executeSortAndPrint).contains("длину"), "asks for length");
@@ -81,7 +92,9 @@ public class AppContextTest {
         check(captureOutput(ctx::executeSortAndPrint).contains("поле"), "asks for comparator");
     }
 
-    private static void testInvalidLength() {
+    @Test
+    @DisplayName("Нулевая длина массива отклоняется")
+    void testInvalidLength() {
         try {
             new AppContext().setArrayLength(0);
             throw new AssertionError("expected IllegalArgumentException");
@@ -90,7 +103,9 @@ public class AppContextTest {
         }
     }
 
-    private static void testStrategyIsReplaceable() {
+    @Test
+    @DisplayName("Стратегия сортировки в контексте взаимозаменяема")
+    void testStrategyIsReplaceable() {
         List<SortStrategy<Car>> strategies = List.of(
                 new BubbleSortStrategy<>(), new InsertionSortStrategy<>(), new SelectionSortStrategy<>());
         for (SortStrategy<Car> strategy : strategies) {
@@ -103,7 +118,9 @@ public class AppContextTest {
         }
     }
 
-    private static void testChangingLengthResetsData() {
+    @Test
+    @DisplayName("Изменение длины массива сбрасывает ранее заполненные данные")
+    void testChangingLengthResetsData() {
         AppContext ctx = readyContext();
         captureOutput(ctx::executeSortAndPrint);
         check(ctx.getData() != null, "data filled");
@@ -111,14 +128,18 @@ public class AppContextTest {
         check(ctx.getData() == null, "data reset after length change");
     }
 
-    private static void testEmptyResult() {
+    @Test
+    @DisplayName("Пустой результат заполнения обрабатывается с сообщением")
+    void testEmptyResult() {
         AppContext ctx = readyContext();
         ctx.setDataFiller(length -> new Car[0]);
         String out = captureOutput(ctx::executeSortAndPrint);
         check(out.contains("Не удалось"), "message for empty result");
     }
 
-    private static void testFillerErrorDoesNotCrash() {
+    @Test
+    @DisplayName("Ошибка в источнике данных не приводит к падению приложения")
+    void testFillerErrorDoesNotCrash() {
         AppContext ctx = readyContext();
         ctx.setDataFiller(length -> {
             throw new IllegalStateException("boom");

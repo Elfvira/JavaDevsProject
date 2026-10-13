@@ -7,6 +7,7 @@ import io.DataFiller;
 import io.FileFiller;
 import io.ManualFiller;
 import io.RandomFiller;
+import io.ResultFileWriter;
 import model.Car;
 import strategy.BubbleSortStrategy;
 import strategy.InsertionSortStrategy;
@@ -45,7 +46,11 @@ public final class Menu {
         System.out.println("3. Выбрать алгоритм сортировки");
         System.out.println("4. Выбрать поле сортировки");
         System.out.println("5. Выполнить сортировку");
-        System.out.println("6. Выход");
+        System.out.println("6. Сортировка только чётных значений (доп. 1)");
+        System.out.println("7. Сохранить результат сортировки в файл [append] (доп. 2)");
+        System.out.println("8. Заполнить 3 коллекции через Stream API (доп. 3)");
+        System.out.println("9. Многопоточный подсчёт вхождений элемента (доп. 4)");
+        System.out.println("0. Выход");
         System.out.print("Ваш выбор: ");
     }
 
@@ -141,6 +146,83 @@ public final class Menu {
             default:
                 return new ByYearComparator();
         }
+    }
+
+    /**
+     * Запрашивает числовое поле для сортировки только чётных значений (Дополнение 1).
+     *
+     * @param scanner источник ввода
+     * @return 1 — Мощность, 2 — Год выпуска
+     */
+    public static int chooseEvenSortField(Scanner scanner) {
+        System.out.println("Числовое поле для сортировки только чётных значений:");
+        System.out.println("1. Мощность (л.с.)");
+        System.out.println("2. Год выпуска");
+        return readInRange(scanner, 1, 2);
+    }
+
+    /**
+     * Запрашивает путь к файлу для сохранения результатов в режиме добавления (Дополнение 2).
+     *
+     * @param scanner источник ввода
+     * @return путь к файлу
+     */
+    public static String readOutputFilePath(Scanner scanner) {
+        System.out.print("Путь к файлу для сохранения (Enter - " + ResultFileWriter.DEFAULT_OUTPUT_FILE + "): ");
+        String path = scanner.nextLine().trim();
+        return path.isEmpty() ? ResultFileWriter.DEFAULT_OUTPUT_FILE : path;
+    }
+
+    /**
+     * Запрашивает режим демонстрации трёх коллекций через Stream API (Дополнение 3).
+     *
+     * @param scanner источник ввода
+     * @return true, если нужно добавить дубликат первого элемента для наглядной демонстрации HashSet
+     */
+    public static boolean askAddDuplicateForDemo(Scanner scanner) {
+        System.out.println("Режим заполнения 3 коллекций (ArrayList, LinkedList, HashSet):");
+        System.out.println("1. Из текущего массива как есть");
+        System.out.println("2. С добавлением дубликата 1-й машины (наглядно показать удаление дубликатов в HashSet)");
+        int choice = readInRange(scanner, 1, 2);
+        return choice == 2;
+    }
+
+    /**
+     * Проводит диалог многопоточного подсчёта вхождений элемента и вызывает подсчёт в контексте (Дополнение 4).
+     *
+     * @param scanner источник ввода
+     * @param ctx     контекст приложения
+     */
+    public static void runConcurrentCountDialog(Scanner scanner, AppContext ctx) {
+        System.out.println("Критерий многопоточного подсчёта вхождений:");
+        System.out.println("1. По мощности (число N)");
+        System.out.println("2. По году выпуска (число N)");
+        System.out.println("3. По названию модели");
+        int searchType = readInRange(scanner, 1, 3);
+
+        int numericVal = 0;
+        String modelVal = "";
+
+        if (searchType == 1) {
+            System.out.println("Укажите искомую мощность N (1-2000):");
+            numericVal = readInRange(scanner, 1, 2000);
+        } else if (searchType == 2) {
+            System.out.println("Укажите искомый год выпуска N (1886-2100):");
+            numericVal = readInRange(scanner, 1886, 2100);
+        } else {
+            while (modelVal.isBlank()) {
+                System.out.print("Введите название модели для поиска: ");
+                modelVal = scanner.nextLine().trim();
+                if (modelVal.isBlank()) {
+                    System.out.println("Модель не может быть пустой.");
+                }
+            }
+        }
+
+        System.out.println("Количество потоков (1-16):");
+        int threads = readInRange(scanner, 1, 16);
+
+        ctx.executeConcurrentCount(searchType, numericVal, modelVal, threads);
     }
 
     private static int readInRange(Scanner scanner, int min, int max) {
