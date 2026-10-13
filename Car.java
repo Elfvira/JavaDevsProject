@@ -1,4 +1,6 @@
 package model;
+import model.Car;
+
 public class Car {
 
     private String model;
