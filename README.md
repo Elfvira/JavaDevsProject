@@ -105,3 +105,121 @@ pom.xml
 .gitignore
 README.md
 
+
+=======
+# JavaDevsProject
+feat-comparators-validation
+Компараторы по трём полям + валидация данных.
+
+Три компаратора для класса Car (ручная реализация, не через Comparator.comparing):
+ByPowerComparator — по мощности (по возрастанию)
+ByModelComparator — по модели (алфавитный порядок, String.compareTo)
+ByYearComparator — по году производства (по возрастанию)
+Каждый компаратор реализует Comparator<Car>.
+Валидация — класс CarValidator с методами:
+Мощность: положительное целое, диапазон 1–2000 л.с.
+Модель: непустая строка, не null, длина 1–50 символов
+Год производства: целое в диапазоне 1886–текущий год
+При невалидных данных — бросать ValidationException с понятным сообщением.
+Валидация применяется ко всем источникам: файл, рандом, ручной ввод.
+
+Пример компаратора:
+
+public class ByPowerComparator implements Comparator<Car> {
+    @Override
+    public int compare(Car c1, Car c2) {
+        return Integer.compare(c1.getPower(), c2.getPower());
+    }
+}
+
+Пример валидатора:
+
+public class CarValidator {
+    public void validatePower(int power) {
+        if (power < 1 || power > 2000) {
+            throw new ValidationException(
+                "Мощность должна быть от 1 до 2000 л.с., получено: " + power);
+        }
+    }
+
+    public void validateModel(String model) {
+        if (model == null || model.isBlank() || model.length() > 50) {
+            throw new ValidationException(
+                "Модель: непустая строка длиной до 50 символов");
+        }
+    }
+
+    public void validateYear(int year) {
+        int currentYear = Year.now().getValue();
+        if (year < 1886 || year > currentYear) {
+            throw new ValidationException(
+                "Год: от 1886 до " + currentYear + ", получено: " + year);
+        }
+    }
+
+    public void validate(Car car) {
+        validatePower(car.getPower());
+        validateModel(car.getModel());
+        validateYear(car.getManufactureYear());
+    }
+}
+
+Ключевые файлы:
+
+comparator/ByPowerComparator.java
+comparator/ByModelComparator.java
+comparator/ByYearComparator.java
+validation/CarValidator.java
+validation/ValidationException.java
+
+
+# JavaDevsProject
+feat-data-input
+Источники заполнения массива данных.
+
+Общий интерфейс DataFiller:
+
+public interface DataFiller {
+    Car[] fill(int length);
+}
+
+Три реализации:
+FileFiller — чтение из текстового файла, парсинг строк формата мощность;модель;год, валидация каждой строки через CarValidator. При ошибке — строка пропускается с предупреждением в консоль.
+RandomFiller — генерация случайных значений в валидных диапазонах: мощность 1–2000, модель из пула предустановленных названий, год 1886–текущий.
+ManualFiller — построчный ввод с клавиатуры через Scanner, валидация каждого поля. При ошибке — повторный запрос поля.
+Все три возвращают массив Car[] заданной длины, используя Car.Builder.
+Длина массива передаётся как параметр; если данных из файла меньше — недостающие элементы не добавляются, возвращается массив фактического размера.
+
+Пример RandomFiller:
+
+public class RandomFiller implements DataFiller {
+    private static final String[] MODELS = {
+        "Toyota Camry", "BMW X5", "Lada Vesta", "Mercedes E200",
+        "Honda Civic", "Audi A4", "Kia Rio", "Nissan Qashqai"
+    };
+
+    @Override
+    public Car[] fill(int length) {
+        Random rnd = new Random();
+        Car[] cars = new Car[length];
+        int currentYear = Year.now().getValue();
+
+        for (int i = 0; i < length; i++) {
+            cars[i] = new Car.Builder()
+                .power(1 + rnd.nextInt(2000))
+                .model(MODELS[rnd.nextInt(MODELS.length)])
+                .manufactureYear(1886 + rnd.nextInt(currentYear - 1885))
+                .build();
+        }
+        return cars;
+    }
+}
+
+Ключевые файлы:
+
+io/DataFiller.java
+io/FileFiller.java
+io/RandomFiller.java
+io/ManualFiller.java
+=======
+
